@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>3D Car Game (Mobile & Desktop)</title>
+    <title>3D Car Game Placeholder</title>
     <style>
         body { margin: 0; overflow: hidden; }
         canvas { display: block; }
@@ -40,7 +40,6 @@
 <script type="module">
 
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.158/examples/jsm/loaders/GLTFLoader.js';
 
 // Scene
 const scene = new THREE.Scene();
@@ -71,15 +70,12 @@ ground.rotation.x = -Math.PI/2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// Car
-let car;
-const loader = new GLTFLoader();
-loader.load('car-good.glb', (gltf)=>{
-    car = gltf.scene;
-    car.scale.set(1,1,1);
-    car.traverse(child => { if(child.isMesh) child.castShadow = true; });
-    scene.add(car);
-});
+// Placeholder car (green cube)
+const carGeo = new THREE.BoxGeometry(1,0.5,2);
+const carMat = new THREE.MeshStandardMaterial({color:0x00ff00});
+const car = new THREE.Mesh(carGeo, carMat);
+car.castShadow = true;
+scene.add(car);
 
 // Input handling
 const keys = { w:false, a:false, s:false, d:false };
@@ -110,26 +106,23 @@ window.addEventListener('resize', ()=> {
 // Animate
 function animate(){
     requestAnimationFrame(animate);
-    if(car){
-        // Forward/backward
-        if(keys.w) speed += accel;
-        else if(keys.s) speed -= accel;
-        else { if(speed>0) speed-=decel; if(speed<0) speed+=decel; }
-        speed = Math.max(-maxSpeed, Math.min(maxSpeed, speed));
 
-        // Turn
-        if(keys.a) car.rotation.y += turnSpeed*(speed/maxSpeed);
-        if(keys.d) car.rotation.y -= turnSpeed*(speed/maxSpeed);
+    // Controls
+    if(keys.w) speed += accel;
+    else if(keys.s) speed -= accel;
+    else { if(speed>0) speed-=decel; if(speed<0) speed+=decel; }
+    speed = Math.max(-maxSpeed, Math.min(maxSpeed, speed));
 
-        // Move
-        car.position.x -= Math.sin(car.rotation.y)*speed;
-        car.position.z -= Math.cos(car.rotation.y)*speed;
+    if(keys.a) car.rotation.y += turnSpeed*(speed/maxSpeed);
+    if(keys.d) car.rotation.y -= turnSpeed*(speed/maxSpeed);
 
-        // Camera follow
-        const offset = new THREE.Vector3(0,5,-10).applyMatrix4(car.matrixWorld);
-        camera.position.lerp(offset,0.1);
-        camera.lookAt(car.position);
-    }
+    car.position.x -= Math.sin(car.rotation.y)*speed;
+    car.position.z -= Math.cos(car.rotation.y)*speed;
+
+    // Camera follow
+    const offset = new THREE.Vector3(0,5,-10).applyMatrix4(car.matrixWorld);
+    camera.position.lerp(offset,0.1);
+    camera.lookAt(car.position);
 
     renderer.render(scene,camera);
 }
